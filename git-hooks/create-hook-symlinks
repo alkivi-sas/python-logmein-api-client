@@ -1,0 +1,18 @@
+#!/bin/bash
+
+HOOK_NAMES="applypatch-msg pre-applypatch post-applypatch pre-commit prepare-commit-msg commit-msg post-commit pre-rebase post-checkout post-merge pre-receive update post-receive post-update pre-auto-gc"
+# assuming the script is in a bin directory, one level into the repo
+BASE_DIR=$(git rev-parse --show-toplevel)/git-hooks
+HOOK_DIR=$(git rev-parse --show-toplevel)/.git/hooks
+
+for hook in $HOOK_NAMES; do
+    if [ -e $BASE_DIR/$hook ]; then
+        if [ ! -h $HOOK_DIR/$hook -a -x $HOOK_DIR/$hook ]; then
+            mv $HOOK_DIR/$hook $HOOK_DIR/$hook.local
+            echo "Copied $HOOK_DIR/$hook to $HOOK_DIR/$hook.local"
+        fi
+
+        ln -s $BASE_DIR/$hook $HOOK_DIR/$hook
+        echo "Installed symlink in $HOOK_DIR/$hook"
+    fi
+done
